@@ -5,13 +5,19 @@ export default function CharacterCard({id, image, name, navigation}) {
   
     const styles = StyleSheet.create({
         container:{
-            padding: 20,
+            margin: 10,
+            padding:10,
             display: 'flex',
-            flexDirection: 'row'
+            flexDirection: 'row',
+            backgroundColor:'grey',
+            borderRadius:10,
         },
         tinyLogo:{
             width:50,
             height:50,
+        },
+        text:{
+
         }
     })
 
@@ -21,7 +27,7 @@ export default function CharacterCard({id, image, name, navigation}) {
                 onPress={() => navigation.navigate('Detail',{id:id})}
         >
                 <Image 
-                    style={styles.image}
+                    style={styles.tinyLogo}
                     source={image}
                 />
           <Text>{name}</Text>
