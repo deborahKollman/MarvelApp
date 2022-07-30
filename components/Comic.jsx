@@ -1,20 +1,30 @@
 import * as React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
 
 export default function Comic({ name, image }) {
   
   const styles = StyleSheet.create({
     container:{
-        padding: 20,
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        // backgroundColor:'lightgrey',
+        borderRadius:10,
+        width:300,
+        alignItems:'center',
+        alignContent:'center',
+        padding:20,
+        marginRight: (Dimensions.get("window").width-300)/2,
+        marginLeft: (Dimensions.get("window").width-300)/2,
     },
     image:{
-        width:100,
-        height:100,
+        width:200,
+        height:200,
         display:'flex',
-        justifyContent: 'center',
+        margin:15,
     },
+    text:{
+      fontWeight:'bold',
+    }
 })
 
   return (
@@ -23,7 +33,7 @@ export default function Comic({ name, image }) {
           style={styles.image}
 				source={{uri: image}}
 			/>
-			<Text>{name}</Text>
+			<Text style={styles.text}>{name}</Text>
     </View>
   )
 }

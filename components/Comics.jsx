@@ -35,7 +35,8 @@ export default function Comics({ listComics }) {
       isLoading 
         ? <ActivityIndicator size="large" color="#00ff00" /> 
         : <FlatList
-            contentContainerStyle={{alignItems: 'center'}}
+            contentContainerStyle={{flex: 1,alignItems: "stretch"}}
+            style={{width:"100%"}}
             data={data}
             keyExtractor={({ id }) => id.toString()}
             horizontal

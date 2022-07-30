@@ -5,19 +5,21 @@ export default function CharacterCard({id, image, name, navigation}) {
   
     const styles = StyleSheet.create({
         container:{
-            margin: 10,
+            margin: 7,
             padding:10,
             display: 'flex',
             flexDirection: 'row',
-            backgroundColor:'grey',
+            alignItems:'center',
+            backgroundColor:'lightgrey',
             borderRadius:10,
         },
         tinyLogo:{
             width:50,
             height:50,
+            borderRadius:5,
+            marginRight:15,
         },
         text:{
-
         }
     })
 
@@ -30,7 +32,7 @@ export default function CharacterCard({id, image, name, navigation}) {
                     style={styles.tinyLogo}
                     source={image}
                 />
-          <Text>{name}</Text>
+          <Text style={styles.text}>{name}</Text>
         </TouchableOpacity>
       );
 }
