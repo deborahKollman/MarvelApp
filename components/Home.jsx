@@ -1,18 +1,25 @@
 import * as React from 'react';
-import { View, ActivityIndicator, FlatList } from 'react-native';
+import { View, ActivityIndicator, FlatList, Dimensions, SafeAreaView, Text } from 'react-native';
 import CharacterCard from './CharacterCard';
 import apiParams from '../config.js';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Searchbar } from 'react-native-paper';
+import { useHeaderHeight } from '@react-navigation/elements';
 
 export default function Home(props) {
 
     const [isLoading, setLoading] = useState(true);
+    const [isFetching, setFetching] = useState(false);
     const [data, setData] = useState([]);
+    const [dataOffset, setDataOffset] = useState(20);
     const [search, setSearch] = useState('');
+    const [dataEnd,setDataEnd] = useState(false);
 
     const { ts, apikey, hash, baseURL } = apiParams;
+    const headerHeight = useHeaderHeight();
+    const height = Dimensions.get('window').height - headerHeight;
+    const flatListRef = useRef();
 
     useEffect(() => {
         axios.get(`${baseURL}/v1/public/characters`, {
@@ -22,7 +29,9 @@ export default function Home(props) {
             hash
         }
         })
-        .then(response => setData(response.data.data.results))
+        .then(response => {
+          setData(response.data.data.results);
+        })
         .catch(error => console.error(error))
         .finally(() => setLoading(false));
     }, []);
@@ -38,7 +47,11 @@ export default function Home(props) {
             nameStartsWith: search
           }
         })
-          .then(response => setData(response.data.data.results))
+          .then(response => {
+            setData(response.data.data.results);
+            setDataOffset(20);
+            if(response.data.data.count<20) setDataEnd(true);
+          })
           .catch(error => console.error(error))
           .finally(() => setLoading(false));
       }
@@ -54,18 +67,64 @@ export default function Home(props) {
               hash
           }
           })
-          .then(response => setData(response.data.data.results))
+          .then(response => {
+            flatListRef.current.scrollToOffset({animated:false, offset:0})
+            setData(response.data.data.results);
+            setDataEnd(false);
+            setDataOffset(20);
+          })
           .catch(error => console.error(error))
           .finally(() => setLoading(false));
       }
     }
 
+    const handleEndReach = (distanceFromEnd) => {
+      setFetching(true);
+      if(!dataEnd){
+        if(search===''){
+          axios.get(`${baseURL}/v1/public/characters`, {
+            params: {
+                offset:dataOffset,
+                ts,
+                apikey,
+                hash,
+            }
+            })
+            .then(response => {
+              setData(data.concat(response.data.data.results));
+              setDataOffset(dataOffset+20);
+              if(response.data.data.count<20) setDataEnd(true);
+            })
+            .catch(error => console.error(error));
+        }else{
+          axios.get(`${baseURL}/v1/public/characters`, {
+            params: {
+                offset:dataOffset,
+                ts,
+                apikey,
+                hash,
+                nameStartsWith: search
+            }
+            })
+            .then(response => {
+              setData(data.concat(response.data.data.results));
+              setDataOffset(dataOffset+20);
+              if(response.data.data.count<20) setDataEnd(true);
+            })
+            .catch(error => console.error(error));
+        }
+      }
+      setFetching(false);
+    }
+
     return (
-        <View>
+        <SafeAreaView  
+        style={{flex:1}}
+        >
           {isLoading 
             ? <ActivityIndicator size="large" color="#00ff00" /> 
             : (
-              <View>
+              <View style={{height:height}}>
                 <Searchbar
                   placeholder="Search for character..."
                   onChangeText={handleChange}
@@ -76,6 +135,17 @@ export default function Home(props) {
                 <FlatList
                   data={data}
                   keyExtractor={({ id }) => id.toString()}
+                  initialNumToRender={20}
+                  ref={flatListRef}
+                  refreshing={isLoading}
+                  onEndReachedThreshold={0.2}
+                  onEndReached={handleEndReach}
+                  ListFooterComponent={
+                    (<View>
+                      {isFetching && <ActivityIndicator size="large" color="#00ff00" /> }
+                      {dataEnd && <Text>End of results</Text>}
+                    </View>)
+                  }
                   renderItem={({ item }) => (
                     <CharacterCard 
                       {...props} 
@@ -87,6 +157,6 @@ export default function Home(props) {
               </View>
             )
           }
-        </View>
+        </SafeAreaView>
     );
 } 

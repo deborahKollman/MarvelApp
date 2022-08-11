@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { Dimensions } from 'react-native';
 import Home from './components/Home';
 import Detail from './components/Detail';
 
