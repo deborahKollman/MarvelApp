@@ -11,10 +11,12 @@ export default function Home(props) {
 
     const [isLoading, setLoading] = useState(true);
     const [isFetching, setFetching] = useState(false);
+    const [isSearch, setIsSearch] = useState(false);
     const [data, setData] = useState([]);
     const [dataOffset, setDataOffset] = useState(20);
     const [search, setSearch] = useState('');
     const [dataEnd,setDataEnd] = useState(false);
+    const [searchResults, setSearchResults] = useState(0);
 
     const { ts, apikey, hash, baseURL } = apiParams;
     const headerHeight = useHeaderHeight();
@@ -48,8 +50,10 @@ export default function Home(props) {
           }
         })
           .then(response => {
+            setSearchResults(response.data.data.total);
             setData(response.data.data.results);
             setDataOffset(20);
+            setIsSearch(true);
             if(response.data.data.count<20) setDataEnd(true);
           })
           .catch(error => console.error(error))
@@ -72,6 +76,7 @@ export default function Home(props) {
             setData(response.data.data.results);
             setDataEnd(false);
             setDataOffset(20);
+            setIsSearch(false);
           })
           .catch(error => console.error(error))
           .finally(() => setLoading(false));
@@ -81,7 +86,7 @@ export default function Home(props) {
     const handleEndReach = (distanceFromEnd) => {
       setFetching(true);
       if(!dataEnd){
-        if(search===''){
+        if(!isSearch){
           axios.get(`${baseURL}/v1/public/characters`, {
             params: {
                 offset:dataOffset,
@@ -140,6 +145,7 @@ export default function Home(props) {
                   refreshing={isLoading}
                   onEndReachedThreshold={0.2}
                   onEndReached={handleEndReach}
+                  ListHeaderComponent={isSearch?(<Text>Search results for "{search}": {searchResults}</Text>):null}
                   ListFooterComponent={
                     (<View>
                       {isFetching && <ActivityIndicator size="large" color="#00ff00" /> }
