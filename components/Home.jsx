@@ -38,85 +38,90 @@ export default function Home(props) {
         .finally(() => setLoading(false));
     }, []);
 
-    function searchCharacter(e) {
+    const searchCharacter = async (e)=> {
       if(search) {
         setLoading(true);
-        axios.get(`${baseURL}/v1/public/characters`, {
+        try {
+          let response = await axios.get(`${baseURL}/v1/public/characters`, {
           params: {
             ts,
             apikey,
             hash,
             nameStartsWith: search
-          }
-        })
-          .then(response => {
-            setSearchResults(response.data.data.total);
-            setData(response.data.data.results);
-            setDataOffset(20);
-            setIsSearch(true);
-            if(response.data.data.count<20) setDataEnd(true);
-          })
-          .catch(error => console.error(error))
-          .finally(() => setLoading(false));
+          } })
+          setSearchResults(response.data.data.total);
+          setData(response.data.data.results);
+          setDataOffset(20);
+          setIsSearch(true);
+          if(response.data.data.count<20) setDataEnd(true);
+        } catch (error) {
+          console.error(error)
+        }
+        setLoading(false)
       }
     }
 
-    const handleChange = (value) => {
+    const handleChange = async (value) => {
       setSearch(value)
       if(value === ''){
-        axios.get(`${baseURL}/v1/public/characters`, {
-          params: {
-              ts,
-              apikey,
-              hash
-          }
-          })
-          .then(response => {
+        try {
+          let response = await axios.get(`${baseURL}/v1/public/characters`, {
+            params: {
+                ts,
+                apikey,
+                hash
+            }
+            })
             flatListRef.current.scrollToOffset({animated:false, offset:0})
             setData(response.data.data.results);
             setDataEnd(false);
             setDataOffset(20);
             setIsSearch(false);
-          })
-          .catch(error => console.error(error))
-          .finally(() => setLoading(false));
+        } catch (error) {
+          console.error(error)
+        }
+        setLoading(false)
       }
     }
 
-    const handleEndReach = (distanceFromEnd) => {
+    const handleEndReach = async (distanceFromEnd) => {
+      if(distanceFromEnd.distanceFromEnd<0) return;
+      console.log(distanceFromEnd.distanceFromEnd)
       setFetching(true);
       if(!dataEnd){
         if(!isSearch){
-          axios.get(`${baseURL}/v1/public/characters`, {
-            params: {
-                offset:dataOffset,
-                ts,
-                apikey,
-                hash,
-            }
+          try {
+            let response = await axios.get(`${baseURL}/v1/public/characters`, {
+              params: {
+                  offset:dataOffset,
+                  ts,
+                  apikey,
+                  hash,
+              }
             })
-            .then(response => {
-              setData(data.concat(response.data.data.results));
-              setDataOffset(dataOffset+20);
-              if(response.data.data.count<20) setDataEnd(true);
-            })
-            .catch(error => console.error(error));
+            setData(data.concat(response.data.data.results));
+            setDataOffset(dataOffset+20);
+            if(response.data.data.count<20) setDataEnd(true);
+          } catch (error) {
+            console.error(error)
+          }
         }else{
-          axios.get(`${baseURL}/v1/public/characters`, {
-            params: {
-                offset:dataOffset,
-                ts,
-                apikey,
-                hash,
-                nameStartsWith: search
-            }
+          try {
+            let response = await axios.get(`${baseURL}/v1/public/characters`, {
+              params: {
+                  offset:dataOffset,
+                  ts,
+                  apikey,
+                  hash,
+                  nameStartsWith: search
+              }
             })
-            .then(response => {
-              setData(data.concat(response.data.data.results));
+            setData(data.concat(response.data.data.results));
               setDataOffset(dataOffset+20);
               if(response.data.data.count<20) setDataEnd(true);
-            })
-            .catch(error => console.error(error));
+          } catch (error) {
+            console.error(error)
+          }
         }
       }
       setFetching(false);
@@ -143,7 +148,7 @@ export default function Home(props) {
                   initialNumToRender={20}
                   ref={flatListRef}
                   refreshing={isLoading}
-                  onEndReachedThreshold={0.2}
+                  onEndReachedThreshold={0}
                   onEndReached={handleEndReach}
                   ListHeaderComponent={isSearch?(<Text>Search results for "{search}": {searchResults}</Text>):null}
                   ListFooterComponent={
