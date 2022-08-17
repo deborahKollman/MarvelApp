@@ -3,9 +3,10 @@ import { View, ActivityIndicator, FlatList, Dimensions, SafeAreaView, Text } fro
 import CharacterCard from './CharacterCard';
 import apiParams from '../config.js';
 import axios from 'axios';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Searchbar } from 'react-native-paper';
 import { useHeaderHeight } from '@react-navigation/elements';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function Home(props) {
 
@@ -21,9 +22,11 @@ export default function Home(props) {
     const { ts, apikey, hash, baseURL } = apiParams;
     const headerHeight = useHeaderHeight();
     const height = Dimensions.get('window').height - headerHeight;
-    const flatListRef = useRef();
+    const isFocused = useIsFocused();
 
     useEffect(() => {
+      if(!isFocused)return;
+      setLoading(true)
         axios.get(`${baseURL}/v1/public/characters`, {
         params: {
             ts,
@@ -36,7 +39,7 @@ export default function Home(props) {
         })
         .catch(error => console.error(error))
         .finally(() => setLoading(false));
-    }, []);
+    }, [isFocused]);
 
     const searchCharacter = async (e)=> {
       if(search) {
@@ -61,7 +64,7 @@ export default function Home(props) {
       }
     }
 
-    const handleChange = async (value) => {
+    const handleInputChange = async (value) => {
       setSearch(value)
       if(value === ''){
         try {
@@ -86,7 +89,6 @@ export default function Home(props) {
 
     const handleEndReach = async (distanceFromEnd) => {
       if(distanceFromEnd.distanceFromEnd<0) return;
-      console.log(distanceFromEnd.distanceFromEnd)
       setFetching(true);
       if(!dataEnd){
         if(!isSearch){
@@ -137,7 +139,7 @@ export default function Home(props) {
               <View style={{height:height}}>
                 <Searchbar
                   placeholder="Search for character..."
-                  onChangeText={handleChange}
+                  onChangeText={handleInputChange}
                   value={search}
                   onIconPress={searchCharacter}
                   onSubmitEditing={searchCharacter}
@@ -146,7 +148,6 @@ export default function Home(props) {
                   data={data}
                   keyExtractor={({ id }) => id.toString()}
                   initialNumToRender={20}
-                  ref={flatListRef}
                   refreshing={isLoading}
                   onEndReachedThreshold={0}
                   onEndReached={handleEndReach}
@@ -162,7 +163,9 @@ export default function Home(props) {
                       {...props} 
                       id={item.id}
                       image={`${item?.thumbnail?.path}.${item?.thumbnail.extension}`} 
-                      name={item.name} />
+                      name={item.name} 
+                      onChange={()=>{}}
+                      />
                   )}
                 />
               </View>
