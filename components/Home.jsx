@@ -75,7 +75,6 @@ export default function Home(props) {
                 hash
             }
             })
-            flatListRef.current.scrollToOffset({animated:false, offset:0})
             setData(response.data.data.results);
             setDataEnd(false);
             setDataOffset(20);
