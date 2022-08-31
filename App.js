@@ -32,10 +32,22 @@ export default function App() {
           headerStyle:{
             backgroundColor:'#F0131E',
           },
-          headerTintColor:'white',
+          headerTintColor:'white'
         })} />
-        <Stack.Screen name="Detail" component={Detail} />
-        <Stack.Screen name="Favorites" component={Favorites} />
+        <Stack.Screen name="Detail" component={Detail} 
+        options={({navigation,route})=>({
+          title:route.params.name,
+          headerStyle:{
+            backgroundColor:'blue',
+          },
+          headerTintColor:'white'
+        })}/>
+        <Stack.Screen name="Favorites" component={Favorites} 
+        options={{headerStyle:{
+          backgroundColor:'#F0131E',
+        },
+        headerTintColor:'white'
+        }}/>
       </Stack.Navigator>
     </NavigationContainer>
     </SafeAreaView>

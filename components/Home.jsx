@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, ActivityIndicator, FlatList, Dimensions, SafeAreaView, Text } from 'react-native';
+import { View, ActivityIndicator, FlatList, Dimensions, SafeAreaView, Text, StyleSheet } from 'react-native';
 import CharacterCard from './CharacterCard';
 import apiParams from '../config.js';
 import axios from 'axios';
@@ -22,10 +22,21 @@ export default function Home(props) {
     const { ts, apikey, hash, baseURL } = apiParams;
     const headerHeight = useHeaderHeight();
     const height = Dimensions.get('window').height - headerHeight;
+    const columns = (Dimensions.get('window').width<600)?1:2;
     const isFocused = useIsFocused();
+
+    const styles=StyleSheet.create({
+      text:{
+        color:'white',
+        fontSize:17,
+        padding:15,
+      }
+    })
 
     useEffect(() => {
       if(!isFocused)return;
+      setIsSearch(false);
+      setSearch('');
       setLoading(true)
         axios.get(`${baseURL}/v1/public/characters`, {
         params: {
@@ -130,12 +141,12 @@ export default function Home(props) {
 
     return (
         <SafeAreaView  
-        style={{flex:1}}
+        style={{flex:1, backgroundColor:'black'}}
         >
           {isLoading 
             ? <ActivityIndicator size="large" color="#00ff00" /> 
             : (
-              <View style={{height:height}}>
+              <View style={{height:height, }}>
                 <Searchbar
                   placeholder="Search for character..."
                   onChangeText={handleInputChange}
@@ -148,13 +159,14 @@ export default function Home(props) {
                   keyExtractor={({ id }) => id.toString()}
                   initialNumToRender={20}
                   refreshing={isLoading}
+                  numColumns={columns}
                   onEndReachedThreshold={0}
                   onEndReached={handleEndReach}
-                  ListHeaderComponent={isSearch?(<Text>Search results for "{search}": {searchResults}</Text>):null}
+                  ListHeaderComponent={isSearch?(<Text style={styles.text}>Search results for "{search}": {searchResults}</Text>):null}
                   ListFooterComponent={
                     (<View>
                       {isFetching && <ActivityIndicator size="large" color="#00ff00" /> }
-                      {dataEnd && <Text>End of results</Text>}
+                      {dataEnd && <Text style={styles.text}>End of results</Text>}
                     </View>)
                   }
                   renderItem={({ item }) => (

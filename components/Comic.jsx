@@ -2,28 +2,28 @@ import * as React from 'react';
 import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
 
 export default function Comic({ name, image }) {
-  
+  const media = (Dimensions.get('window').width<600)?(Dimensions.get("window").width-300)/2:30;
+
   const styles = StyleSheet.create({
     container:{
         display: 'flex',
         flexDirection: 'column',
-        // backgroundColor:'lightgrey',
-        borderRadius:10,
         width:300,
         alignItems:'center',
-        alignContent:'center',
+        justifyContent:'center',
         padding:20,
-        marginRight: (Dimensions.get("window").width-300)/2,
-        marginLeft: (Dimensions.get("window").width-300)/2,
+        marginHorizontal: media,
     },
     image:{
-        width:200,
-        height:200,
-        display:'flex',
-        margin:15,
+      display:'flex',
+      flex:3/4,
+      width:Dimensions.get('window').width*3/4,
+      resizeMode: 'contain',
+      aspectRatio: 1,
     },
     text:{
       fontWeight:'bold',
+      padding:30,
     }
 })
 

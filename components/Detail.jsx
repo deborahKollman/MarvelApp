@@ -33,13 +33,17 @@ export default function Detail({ route }) {
       tabBarOptions={{
         activeTintColor: 'darkred'
       }}
+      sceneContainerStyle={{
+        backgroundColor:'white'
+      }}
     >
       <Tab.Screen 
         name="Information" 
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="information-circle" color={color} size={size} />
-          )
+          ),
+          headerShown:false
         }}
       >
         {() => 
@@ -58,7 +62,8 @@ export default function Detail({ route }) {
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="book" color={color} size={size} />
-          )
+          ),
+          headerShown:false
         }}
       >
         {() => 

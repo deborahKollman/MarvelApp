@@ -1,13 +1,27 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { SafeAreaView, View, FlatList, ActivityIndicator, Text } from 'react-native';
+import { SafeAreaView, View, FlatList, ActivityIndicator, Text, Dimensions, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CharacterCard from './CharacterCard';
 
 export default function Favorites(props){
+    const styles=StyleSheet.create({
+        container:{
+            flex:1,
+            backgroundColor:'black',
+        },
+        text:{
+            display:'flex',
+            justifyContent:'center',
+            color:'white',
+            fontSize:20,
+        }
+    })
+
     const [isLoading,setLoading] = useState(true);
     const [data,setData] = useState([]);    
     
+    const columns = (Dimensions.get('window').width<600)?1:2;
 
     useEffect(async() => {
         try {
@@ -39,13 +53,14 @@ export default function Favorites(props){
     }
 
     return(
-        <SafeAreaView style={{flex:1}}>
+        <SafeAreaView style={styles.container}>
             {isLoading?<ActivityIndicator size="large" color="#00ff00" /> :
             <View>
-                {data.length===0 && <Text>No items found</Text>}
+                {data.length===0 && <Text style={styles.text}>No items found</Text>}
                 <FlatList
                 data={data}
                 keyExtractor={({ id }) => id.toString()}
+                numColumns={columns}
                 renderItem={({ item }) => (
                     <CharacterCard 
                       {...props} 
